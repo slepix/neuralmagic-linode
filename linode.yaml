@@ -1,0 +1,48 @@
+#cloud-config
+
+packages:
+  - python3-pip
+  - nginx
+runcmd:
+  - rm /etc/nginx/sites-available/default
+write_files:
+  - path: /etc/nginx/sites-available/default
+    content: |
+      server {
+          listen 80 default_server;
+          listen [::]:80 default_server;
+
+          location / {
+              proxy_pass http://127.0.0.1:5543;
+              proxy_set_header Host $host;
+              proxy_set_header X-Real-IP $remote_addr;
+              proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+              proxy_set_header X-Forwarded-Proto $scheme;
+          }
+      }
+
+  - path: /etc/systemd/system/deepsparse.service
+    content: |
+      [Unit]
+      Description=DeepSparse Service
+      After=network.target
+
+      [Service]
+      Type=simple
+      ExecStart=/bin/bash /usr/local/bin/deepsparse-service.sh
+      Restart=always
+
+      [Install]
+      WantedBy=multi-user.target
+
+runcmd:
+  - pip3 install deepsparse
+  - pip3 install deepsparse[server] 
+  - pip3 install deepsparse[transformers]
+  - systemctl enable nginx
+  - systemctl restart nginx
+  - echo "deepsparse.server --host "127.0.0.1" --task sentiment-analysis --model_path zoo:nlp/sentiment_analysis/obert-base/pytorch/huggingface/sst2/pruned90_quant-none" > /usr/local/bin/deepsparse-service.sh
+  - chmod +x /usr/local/bin/deepsparse-service.sh
+  - systemctl daemon-reload
+  - systemctl enable deepsparse
+  - systemctl start deepsparse
