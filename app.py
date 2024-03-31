@@ -4,7 +4,7 @@ from deepsparse import TextGeneration
 app = Flask(__name__)
 
 # Your API key
-KEY = "test.123"
+KEY = "ReplaceMe.123!"
 
 # Initialize the text generation pipeline
 pipeline = TextGeneration(model="zoo:mpt-7b-dolly_mpt_pretrain-pruned50_quantized")
@@ -17,10 +17,10 @@ def authenticate(key):
 @app.route('/generate_text', methods=['POST'])
 def generate_text():
     # Check if the request has the API key
-    key = request.headers['key']
-
     if 'key' not in request.headers:
         return jsonify({'error': 'API key is missing'}), 401
+
+    key = request.headers['key']
 
     # Authenticate the request
     if not authenticate(key):
@@ -37,4 +37,4 @@ def generate_text():
 
 if __name__ == '__main__':
     # Run the app, listening on all IP addresses
-    app.run(host='0.0.0.0', port=6000, debug=False)
+    app.run(host='127.0.0.1', port=5000, debug=False)
