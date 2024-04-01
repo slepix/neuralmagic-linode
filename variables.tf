@@ -10,7 +10,7 @@ variable "primary_region" {
 }
 
 variable "vmcount" {
-  default = 3
+  default = 2
 }
 
 
