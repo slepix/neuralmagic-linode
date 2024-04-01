@@ -35,7 +35,7 @@ def analyze_sentiment(comment):
         return "error"
 
 # Number of workers for multiprocessing
-num_workers = 8
+num_workers = 16
 
 with Pool(num_workers) as pool:
     # Map sentiment analysis function to comments using multiprocessing
